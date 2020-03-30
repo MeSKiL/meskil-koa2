@@ -2,7 +2,8 @@ const basicAuth = require('basic-auth')
 const jwt = require('jsonwebtoken')
 
 class Auth {
-    constructor() {
+    constructor(level) {
+        this.level = level || 1
     }
 
     get m() {
@@ -15,17 +16,30 @@ class Auth {
             }
             try {
                 const decode = jwt.verify(userToken.name, global.config.security.secretKey)
+                if (decode.scope < this.level) {
+                    errMsg = '权限不足'
+                    throw new Error()
+                }
                 ctx.auth = {
                     uid: decode.uid,
                     scope: decode.scope
                 }
-                await next()
             } catch (e) {
                 if (e.name === 'TokenExpiredError') {
                     errMsg = 'token已过期'
                 }
                 throw new global.errs.Forbidden(errMsg)
             }
+            await next()
+        }
+    }
+
+    static verifyToken(token){
+        try{
+            jwt.verify(token, global.config.security.secretKey)
+            return true
+        }catch (e) {
+            return false
         }
     }
 }

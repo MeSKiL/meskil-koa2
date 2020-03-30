@@ -39,4 +39,25 @@ class Forbidden extends HttpException {
     }
 }
 
-module.exports = {HttpException, ParameterException, Success, NotFound, AuthFailed, Forbidden}
+class LikeError extends HttpException {
+    constructor(msg, errorCode) {
+        super(msg || '你已经点赞过', errorCode || ERROR_CODE.HAVE_LIKED, HTTP_STATUS.PARAMETER_EXCEPTION);
+    }
+}
+
+class DislikeError extends HttpException {
+    constructor(msg, errorCode) {
+        super(msg || '你已取消点赞', errorCode || ERROR_CODE.HAVE_DISLIKED, HTTP_STATUS.PARAMETER_EXCEPTION);
+    }
+}
+
+module.exports = {
+    HttpException,
+    ParameterException,
+    Success,
+    NotFound,
+    AuthFailed,
+    Forbidden,
+    LikeError,
+    DislikeError
+}

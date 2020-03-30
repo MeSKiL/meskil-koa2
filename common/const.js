@@ -12,7 +12,9 @@ const ERROR_CODE = {
     SYSTEM_EXCEPTION: 999,
     NORMAL_ERROR: 10000,
     AUTH_FAILED: 10004,
-    FORBIDDEN: 10006
+    FORBIDDEN: 10006,
+    HAVE_LIKED:60001,
+    HAVE_DISLIKED:60002
 }
 
 const LOGIN_TYPE = {
@@ -21,6 +23,18 @@ const LOGIN_TYPE = {
     USER_MOBILE: 102,
     ADMIN_EMAIL: 200,
     isThisType
+}
+
+const USER_AUTHORITY = {
+    NORMAL: 8,
+    ADMIN: 16
+}
+
+const ART_TYPE = {
+    MOVIE:100,
+    MUSIC:200,
+    SENTENCE:300,
+    BOOK:400
 }
 
 function isThisType(val) {
@@ -32,4 +46,4 @@ function isThisType(val) {
     return false
 }
 
-module.exports = {HTTP_STATUS, ERROR_CODE, LOGIN_TYPE, isThisType}
+module.exports = {HTTP_STATUS, ERROR_CODE, LOGIN_TYPE, USER_AUTHORITY,ART_TYPE, isThisType}

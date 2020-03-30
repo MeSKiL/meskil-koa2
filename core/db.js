@@ -18,6 +18,7 @@ const sequelize = new Sequelize(dbName, user, password, {
 
 sequelize.sync({
     // true则自动删除原有表重新创建
+    force:false
 })
 
 module.exports = {

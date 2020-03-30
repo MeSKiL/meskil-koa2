@@ -1,6 +1,7 @@
-const {LinValidator, Rule} = require('../../core/lin-validator-v2')
-const {User} = require('../models/user')
-const {LOGIN_TYPE} = require('../../common/const')
+const {LinValidator, Rule} = require('@core/lin-validator-v2')
+const {User} = require('@models/user')
+const {LOGIN_TYPE} = require('@common/const')
+
 class PositiveIntegerValidator extends LinValidator {
     constructor() {
         super();
@@ -71,20 +72,41 @@ class TokenValidator extends LinValidator {
             // web account + secret
             // 小程序 account
         ]
+        this.validateType = checkType
     }
 
-    validateLoginType(vals){
-        if(!vals.body.type){
-            throw new Error('type是必须参数')
-        }
-        if(!LOGIN_TYPE.isThisType(vals.body.type)){
-            throw new Error('type参数不合法')
-        }
+
+}
+
+class NotEmptyValidator extends LinValidator {
+    constructor() {
+        super()
+        this.token = [
+            new Rule('isLength', '不允许为空', {min: 1})
+        ]
+    }
+}
+
+class LikeValidator extends PositiveIntegerValidator{
+    constructor() {
+        super()
+        this.validateType = checkType
+    }
+}
+
+function checkType(vals) {
+    if (!vals.body.type) {
+        throw new Error('type是必须参数')
+    }
+    if (!LOGIN_TYPE.isThisType(vals.body.type)) {
+        throw new Error('type参数不合法')
     }
 }
 
 module.exports = {
     PositiveIntegerValidator,
     RegisterValidator,
-    TokenValidator
+    TokenValidator,
+    NotEmptyValidator,
+    LikeValidator
 }

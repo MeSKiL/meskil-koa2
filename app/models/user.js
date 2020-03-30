@@ -1,6 +1,6 @@
 const {Model, DataTypes} = require('sequelize')
 const bcrypt = require('bcryptjs')
-const {sequelize} = require('../../core/db')
+const {sequelize} = require('@core/db')
 
 class User extends Model { // 不允许加构造器
     static async verifyEmailPassword(email, plainPassword) {
@@ -12,12 +12,25 @@ class User extends Model { // 不允许加构造器
         if (!user) {
             throw new global.errs.AuthFailed('用户不存在')
         }
-        console.log(user.password)
         const correct = bcrypt.compareSync(plainPassword, user.dataValues.password)
-        if(!correct){
+        if (!correct) {
             throw new global.errs.AuthFailed('密码错误')
         }
         return user
+    }
+
+    static async getUserByOpenid(openid) {
+        return User.findOne({
+            where: {
+                openid
+            }
+        })
+    }
+
+    static registerByOpenid(openid) {
+        return User.create({
+            openid
+        })
     }
 }
 
@@ -41,7 +54,7 @@ User.init({
             this.setDataValue('password', psw)
         }
     },
-    openId: {
+    openid: {
         type: DataTypes.STRING(64),
         unique: true // 唯一
     }
