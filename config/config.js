@@ -16,5 +16,6 @@ module.exports = {
     wx:{
         appId:'wxf65a1cca099d35e6',
         appSecret:'769f8d951b103399e314f91b6153dda3',
-    }
+    },
+    host:'http://localhost:3000/'
 }

@@ -10,10 +10,38 @@ class Flow extends Model {
                 ['index', 'DESC']
             ]
         })
-        const art = await Art.getData(flow.artId, flow.type)
-        const likeLatest = await Favor.userLikeIt(flow.artId, flow.type, uid)
+        return Flow.getArtByFlow(flow, uid)
+    }
+
+    static async getNext(uid, index) {
+        const flow = await Flow.findOne({
+            where: {
+                index: index + 1
+            }
+        })
+        if (!flow) {
+            throw new global.errs.NotFound()
+        }
+        return Flow.getArtByFlow(flow, uid)
+    }
+
+    static async getPrevious(uid, index) {
+        const flow = await Flow.findOne({
+            where: {
+                index: index - 1
+            }
+        })
+        if (!flow) {
+            throw new global.errs.NotFound()
+        }
+        return Flow.getArtByFlow(flow, uid)
+    }
+
+    static async getArtByFlow(flow, uid) {
+        const art = await new Art(flow.artId, flow.type).getData()
+        const like = await Favor.userLikeIt(flow.artId, flow.type, uid)
         art.setDataValue('index', flow.index)
-        art.setDataValue('like_status', likeLatest)
+        art.setDataValue('likeStatus', like)
         return art
     }
 }

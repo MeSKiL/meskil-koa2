@@ -1,6 +1,6 @@
 const {LinValidator, Rule} = require('@core/lin-validator-v2')
 const {User} = require('@models/user')
-const {LOGIN_TYPE} = require('@common/const')
+const {LOGIN_TYPE, ART_TYPE} = require('@common/const')
 
 class PositiveIntegerValidator extends LinValidator {
     constructor() {
@@ -57,6 +57,7 @@ class RegisterValidator extends LinValidator {
 class TokenValidator extends LinValidator {
     constructor() {
         super();
+        let checker = new Checker(ART_TYPE)
         this.account = [
             new Rule('isLength', '不符合账号规则', {
                 min: 4,
@@ -72,10 +73,8 @@ class TokenValidator extends LinValidator {
             // web account + secret
             // 小程序 account
         ]
-        this.validateType = checkType
+        this.validateType = checker.checkType.bind(checker)
     }
-
-
 }
 
 class NotEmptyValidator extends LinValidator {
@@ -87,19 +86,60 @@ class NotEmptyValidator extends LinValidator {
     }
 }
 
-class LikeValidator extends PositiveIntegerValidator{
+class LikeValidator extends PositiveIntegerValidator {
     constructor() {
         super()
-        this.validateType = checkType
+        let checker = new Checker(ART_TYPE)
+        this.validateType = checker.checkType.bind(checker)
     }
 }
 
-function checkType(vals) {
-    if (!vals.body.type) {
-        throw new Error('type是必须参数')
+class ClassicValidator extends LikeValidator {
+
+}
+
+class SearchValidator extends LinValidator {
+    constructor() {
+        super()
+        this.q = [
+            new Rule('isLength', '搜索关键字不能为空', {min: 1, max: 32})
+        ]
+        this.start = [
+            new Rule('isInt', '不符合规范', {min: 0, max: 60000}),
+            new Rule('isOptional', '', 0) // 默认值
+        ]
+        this.count = [
+            new Rule('isInt', '不符合规范', {min: 1, max: 20}),
+            new Rule('isOptional', '', 20)
+        ]
     }
-    if (!LOGIN_TYPE.isThisType(vals.body.type)) {
-        throw new Error('type参数不合法')
+}
+
+class AddShortCommentValidator extends PositiveIntegerValidator {
+    constructor() {
+        super()
+        this.content = [
+            new Rule('isLength', '必须在1到12个字符之间', {
+                min: 1,
+                max: 12
+            })
+        ]
+    }
+}
+
+class Checker {
+    constructor(type) {
+        this.enumType = type
+    }
+
+    checkType(vals) {
+        const type = vals.body.type || Number(vals.path.type)
+        if (!type) {
+            throw new Error('type是必须参数')
+        }
+        if (!this.enumType.isThisType(type)) {
+            throw new Error('type参数不合法')
+        }
     }
 }
 
@@ -108,5 +148,8 @@ module.exports = {
     RegisterValidator,
     TokenValidator,
     NotEmptyValidator,
-    LikeValidator
+    LikeValidator,
+    ClassicValidator,
+    SearchValidator,
+    AddShortCommentValidator
 }
